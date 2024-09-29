@@ -13,40 +13,40 @@ import org.springframework.stereotype.Service;
 @Service
 @Slf4j
 public class TestService {
-  private static final String RESPONSE_TIME_METRIC_NAME = "test.service.response.time.seconds";
-  private static final String VISITS_METRIC_NAME = "test.service.visits";
-  private static final String VISITS2_METRIC_NAME = "test.service.visits2";
+  private static final String TEST_SERVICE_RESPONSE_TIME_SECONDS = "test.service.response.time.seconds";
+  private static final String TEST_SERVICE_QUEUE_LENGTH_HISTOGRAM = "test.service.queue.length.histogram";
+  private static final String TEST_SERVICE_QUEUE_LENGTH_SUMMARY = "test.service.queue.length.summary";
   private final Timer testServiceResponseTimeSeconds;
-  private final DistributionSummary testServiceVisitHistogram;
-  private final DistributionSummary testServiceVisitSummary;
+  private final DistributionSummary testServiceQueueLengthHistogram;
+  private final DistributionSummary testServiceQueueLengthSummary;
   private final NormalRandomGenerator serviceResponseTimeSecondsGenerator;
-  private final PoissonRandomGenerator serviceVisitsGenerator;
+  private final PoissonRandomGenerator meanQueueLengthGenerator;
 
   public TestService(
       @Value("${spring.application.test.service.mean.response.time.seconds}")
-          double serviceMeanResponseTimeSeconds,
+          double meanResponseTimeSeconds,
       @Value("${spring.application.test.service.stddev.response.time.seconds}")
-          double servicestddevResponseTimeSeconds,
-      @Value("${spring.application.test.service.mean.visits}") double serviceVisitMeans,
+          double stddevResponseTimeSeconds,
+      @Value("${spring.application.test.service.mean.queue.length}") double meanQueueLength,
       MeterRegistry meterRegistry) {
 
     // this will be published as a Prometheus histogram
-    this.testServiceVisitHistogram =
-        DistributionSummary.builder(VISITS_METRIC_NAME)
+    this.testServiceQueueLengthHistogram =
+        DistributionSummary.builder(TEST_SERVICE_QUEUE_LENGTH_HISTOGRAM)
             .maximumExpectedValue(20.0)
             .publishPercentileHistogram()
             .register(meterRegistry);
 
     // this will be published as a Prometheus summary
-    this.testServiceVisitSummary =
-        DistributionSummary.builder(VISITS2_METRIC_NAME)
+    this.testServiceQueueLengthSummary =
+        DistributionSummary.builder(TEST_SERVICE_QUEUE_LENGTH_SUMMARY)
             .maximumExpectedValue(20.0)
             .publishPercentiles(0.25, 0.5, 0.75, 0.95)
             .register(meterRegistry);
 
     // this will be published as a Prometheus histogram
     this.testServiceResponseTimeSeconds =
-        Timer.builder(RESPONSE_TIME_METRIC_NAME)
+        Timer.builder(TEST_SERVICE_RESPONSE_TIME_SECONDS)
             .serviceLevelObjectives(
                 Duration.ofMillis(100),
                 Duration.ofMillis(200),
@@ -66,8 +66,8 @@ public class TestService {
             .maximumExpectedValue(Duration.ofMillis(1500))
             .register(meterRegistry);
     this.serviceResponseTimeSecondsGenerator =
-        new NormalRandomGenerator(serviceMeanResponseTimeSeconds, servicestddevResponseTimeSeconds);
-    this.serviceVisitsGenerator = new PoissonRandomGenerator(serviceVisitMeans);
+        new NormalRandomGenerator(meanResponseTimeSeconds, stddevResponseTimeSeconds);
+    this.meanQueueLengthGenerator = new PoissonRandomGenerator(meanQueueLength);
   }
 
   public void testApi() {
@@ -77,18 +77,18 @@ public class TestService {
     log.debug("The response time is {} ms", responseTimeMillis);
   }
 
-  public void getVisits() {
-    int visits = serviceVisitsGenerator.poissonRandom();
-    testServiceVisitHistogram.record(visits);
-    testServiceVisitSummary.record(visits);
-    log.debug("The number of Visits {}", visits);
+  public void recordQueueLength() {
+    int queueLength = meanQueueLengthGenerator.poissonRandom();
+    testServiceQueueLengthHistogram.record(queueLength);
+    testServiceQueueLengthSummary.record(queueLength);
+    log.debug("The queue length {}", queueLength);
   }
 
-  public void setServiceMeanResponseTimeSeconds(double newMean) {
+  public void setMeanResponseTimeSeconds(double newMean) {
     serviceResponseTimeSecondsGenerator.setMean(newMean);
   }
 
-  public void setServiceVisitMeans(double mean) {
-    serviceVisitsGenerator.setMean(mean);
+  public void setMeanQueueLength(double mean) {
+    meanQueueLengthGenerator.setMean(mean);
   }
 }

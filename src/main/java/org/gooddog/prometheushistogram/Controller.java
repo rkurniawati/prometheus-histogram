@@ -14,11 +14,11 @@ class Controller {
 
   @PostMapping("/setMeanResponseTimeSeconds")
   public void setResponseTimeSecondsMean(@RequestBody double seconds) {
-    testService.setServiceMeanResponseTimeSeconds(seconds);
+    testService.setMeanResponseTimeSeconds(seconds);
   }
 
-  @PostMapping("/setMeanNumberOfVisits")
-  public void setMeanNumberOfVisits(@RequestBody double mean) {
-    testService.setServiceVisitMeans(mean);
+  @PostMapping("/setMeanQueueLength")
+  public void setMeanQueueLength(@RequestBody double mean) {
+    testService.setMeanQueueLength(mean);
   }
 }

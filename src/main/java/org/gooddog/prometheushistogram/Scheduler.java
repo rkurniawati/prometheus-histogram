@@ -14,6 +14,6 @@ class Scheduler {
   @Scheduled(fixedRate = 1000)
   public void schedule() {
     testService.testApi();
-    testService.getVisits();
+    testService.recordQueueLength();
   }
 }

@@ -52,7 +52,7 @@ http://localhost:3000/
 
 To change the average response time and request count, you can use the following REST endpoints:
 - http://localhost:8080/setResponseTimeMeanSeconds
-- http://localhost:8080/setMeanNumberOfVisits
+- http://localhost:8080/setMeanQueueLength
 
 For example, to set the average response time to 700 ms, you can use the following command:
 
@@ -60,8 +60,8 @@ For example, to set the average response time to 700 ms, you can use the followi
 curl -v -X POST http://localhost:8080/setMeanResponseTimeSeconds -H "Content-Type: application/json" -d 0.7
 ```
 
-To set the mean number of visits to 5, you can use the following command:
+To set the mean queue length to 5, you can use the following command:
 
 ```bash
-curl -v -X POST http://localhost:8080/setMeanNumberOfVisits -H "Content-Type: application/json" -d 5
+curl -v -X POST http://localhost:8080/setMeanQueueLength -H "Content-Type: application/json" -d 5
 ```
