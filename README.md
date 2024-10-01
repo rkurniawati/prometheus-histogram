@@ -1,7 +1,7 @@
 # Example Spring Boot app that publishes Prometheus histogram and summary metrics
 
 This is an example Spring Boot application that demonstrates how you can create and publish Prometheus histogram and 
-summary metrics using the Micrometer library. More information can be found in this article.
+summary metrics using the Micrometer library. More information can be found in this [article](https://medium.com/@ruth.kurniawati/publishing-prometheus-histograms-and-summaries-using-micrometer-in-a-spring-boot-application-d9ae6ba46660).
 
 ## Requirements
 
